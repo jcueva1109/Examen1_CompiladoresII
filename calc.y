@@ -54,7 +54,7 @@ start: stmt_list EOL_List
 ;
 
 stmt_list: stmt_list EOL_List stmt { }
-    | stmt {  }
+    | stmt { }
 ;
 
 EOL_List: EOL_List EOL {  }
@@ -96,8 +96,8 @@ term: term MUL factor { $$ = $1 * $3; }
     | relational_expr { $$ = $1; }
 ;
 
-relational_expr: relational_expr Greater factor { $$ = $1 > $3; }
-    | relational_expr Less factor { $$ = $1 < $3; }
+relational_expr: relational_expr Greater factor { $$ = $1 > $3; if($1 > $3){ printf("%f > %f = true\n",$1,$3); }else{ printf("%f > %f = false\n",$1,$3); } }
+    | relational_expr Less factor { $$ = $1 < $3; if($1 < $3){ printf("%f < %f = true\n",$1,$3); }else{ printf("%f > %f = false\n",$1,$3); } }
     | factor { $$ = $1; }
 ;
 
