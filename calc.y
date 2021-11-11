@@ -53,7 +53,7 @@
 start: stmt_list EOL_List
 ;
 
-stmt_list: stmt_list EOL_List stmt
+stmt_list: stmt_list EOL_List stmt { }
     | stmt {  }
 ;
 
@@ -61,18 +61,21 @@ EOL_List: EOL_List EOL {  }
     | EOL
 ;
 
-stmt: LET Identifier ASSIGN expr 
-    | LET Identifier LParenthesis PARAMS_List RParenthesis ASSIGN expr { }
+Assign_: Identifier ASSIGN expr
+;
+
+stmt: LET Assign_
+    | LET Identifier LParenthesis PARAMS_List RParenthesis ASSIGN block { }
     | expr {  }
     | func_call {  } 
 ;
 
 block: WHILE LParenthesis expr RParenthesis DO stuff
+    | expr
 ;
 
-stuff: Identifier ASSIGN expr
-    | Identifier ASSIGN expr Comma expr DONE
-    |
+stuff: Assign_ Semicolon Assign_ DONE EOL_List func_call
+    | Assign_ Semicolon
 ;
 
 func_call: Identifier LParenthesis PARAMS_List RParenthesis
@@ -80,6 +83,7 @@ func_call: Identifier LParenthesis PARAMS_List RParenthesis
 
 PARAMS_List: Identifier Comma PARAMS_List
     | Identifier 
+    | Number
 ;
 
 expr: expr ADD term { $$ = $1 + $3; }
@@ -102,8 +106,7 @@ factor: Number { $$ = $1; }
     | LParenthesis expr RParenthesis { $$ = $2; }
 ;
 
-id: Identifier { $$ = $1; }
-    | 
+id: Identifier { $$ = $1; } 
 ;
 
 %%
