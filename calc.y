@@ -46,7 +46,7 @@
 %token EOL
 
 %type<float_t> expr term relational_expr factor
-%type<ident_t> id
+%type<ident_t> Assign_ id
 
 %%
 
@@ -61,13 +61,13 @@ EOL_List: EOL_List EOL {  }
     | EOL
 ;
 
-Assign_: Identifier ASSIGN expr
 ;
+Assign_: Identifier ASSIGN expr { printf("Variable %s declarada\n",$1); }
 
 stmt: LET Assign_
-    | LET Identifier LParenthesis PARAMS_List RParenthesis ASSIGN block { }
-    | expr {  }
-    | func_call {  } 
+    | func_call { } 
+    | LET Identifier LParenthesis PARAMS_List RParenthesis ASSIGN block { printf("Metodo %s declarado\n",$2); }
+    | expr { printf("Resultado = %f\n",$1); }
 ;
 
 block: WHILE LParenthesis expr RParenthesis DO stuff
@@ -76,12 +76,14 @@ block: WHILE LParenthesis expr RParenthesis DO stuff
 
 stuff: Assign_ Semicolon Assign_ DONE EOL_List func_call
     | Assign_ Semicolon
+    | expr  Semicolon expr DONE EOL_List func_call
 ;
 
 func_call: Identifier LParenthesis PARAMS_List RParenthesis
 ;
 
 PARAMS_List: Identifier Comma PARAMS_List
+    | expr Comma PARAMS_List { printf("Return: %f",$1); }
     | Identifier 
     | Number
 ;
@@ -96,8 +98,8 @@ term: term MUL factor { $$ = $1 * $3; }
     | relational_expr { $$ = $1; }
 ;
 
-relational_expr: relational_expr Greater factor { $$ = $1 > $3; if($1 > $3){ printf("%f > %f = true\n",$1,$3); }else{ printf("%f > %f = false\n",$1,$3); } }
-    | relational_expr Less factor { $$ = $1 < $3; if($1 < $3){ printf("%f < %f = true\n",$1,$3); }else{ printf("%f > %f = false\n",$1,$3); } }
+relational_expr: relational_expr Greater factor { $$ = $1 > $3; }
+    | relational_expr Less factor { $$ = $1 < $3; }
     | factor { $$ = $1; }
 ;
 
